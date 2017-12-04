@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Lyrics scraper</title>
+	<style>
+		body {
+			font-family: Helvetica;
+		}
+		.long {
+			font-size: 1em;
+			min-width: 80vw;
+		}
+
+		button {
+			font-size: 1em
+		}
+
+
+		.results {
+			margin: 0 0.5em;
+			border: 1px solid #aaa;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.result-header {
+			padding: 0.5em 0.5em 0 0.5em;
+		}
+
+		.result, .table-header {
+			padding: 0.5em;
+			flex: 1;
+			display: flex;
+		}
+
+		.table-header {
+			background-color: #768abd;
+			color: #fff;
+		}
+
+		.result {
+			border: 1px solid #aaa;
+		}
+
+
+		.title, .density {
+			/*border: 1px solid blue;*/
+		}
+
+		.title {
+			flex: 7;
+		}
+
+		.density {
+			flex: 1;
+		}
+
+		form {
+			display: flex;
+			justify-content: center;
+			}
+	</style>
+</head>
+<body>
+	<div class="main">
+		<div class="query">
+			<form action="">
+				<input class="long" type="text" placeholder="Type in the characters you want to find">
+				<button type="submit">Fetch!</button>
+			</form>
+		</div>
+			<div class="result-header"><strong>Results</strong></div>
+		<div class="results">
+			<div class="table-header">
+				<div class="title">Song</div>
+				<div class="density">Density</div>
+			</div>
+<!-- 			<div class="result">
+				<div class="title">Justin Bieber - You're gonna like it</div>
+				<div class="density">3.19191</div>
+			</div> -->
+		</div>
+	</div>
+
+	<script>
+		function padZeroes(num, zeroes) {
+			num = String(num);
+			zeroes = zeroes || 6;
+			let num_arr = [];
+			for (let i=0; i<zeroes; i++) {num_arr.push('0')};
+			for (i of num.split('')) {
+				num_arr.splice(0,1)
+				num_arr.push(i)
+			}
+			return num_arr.join('')
+		};
+
+		function grabLyrics(e, song_number) {
+			song_number = padZeroes(song_number);
+			let url_to_fetch = `http://m.kuwo.cn/newh5/singles/songinfoandlrc?musicId=${song_number}`;
+			console.log(url_to_fetch);
+			fetch(url_to_fetch)
+				.then(res => res.json())
+				.then(function(data) {
+					let lyrics = data.data.lrclist;
+					console.log(lyrics);
+					let occurrences = 0;
+					length = lyrics.reduce(function(acc, line) {
+						if (line.lineLyric.match(/(钱|爱|我|你|给我)/g)) {occurrences += line.lineLyric.match(/(钱|爱|我|你|给我)/g).length}
+						return acc + line.lineLyric.length}, 0);
+					console.log(1000*(occurrences/length))
+					if (occurrences>0) {
+						console.log('Inside if')
+						resultToDOM(lyrics[0].lineLyric, 1000*(occurrences/length))
+					}
+		})
+		.catch(err => console.error(err));
+	};
+
+		function resultToDOM(title, density) {
+			// let newDiv = document.createElement("div")
+			// let content = document.createTextNode(`${title}, ${density}`);
+			// newDiv.appendChild(content);
+			// newDiv.setAttribute('style', `order:${Math.floor(1000-density)}`)
+			// console.log(newDiv, content);
+			// let lastResult = document.querySelector('.result');
+			// console.log(lastResult);
+			// document.querySelector('.results').insertBefore(newDiv, lastResult);
+
+			newDiv = `
+			<div class="result" style="order:${Math.floor(1000-density)};">
+				<div class="title">${title}</div>
+				<div class="density">${density}</div>
+			</div>
+			`
+			let results = document.querySelector('.results');
+			results.innerHTML += newDiv
+		}
+
+		const form = document.querySelector('form')
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			for (let i = 444555; i <449555; i = i+10) {
+				this.e = e;
+				this.i = i;
+				console.log(this.e, this.i)
+				console.log('in for loop')
+				let lyrix = () => {
+				grabLyrics(e, i)
+				console.log(e,i)
+				grabLyrics(e, i+1)
+				grabLyrics(e, i+2)
+				grabLyrics(e, i+3)
+				grabLyrics(e, i+4)
+				grabLyrics(e, i+5)
+				grabLyrics(e, i+7)
+				grabLyrics(e, i+8)
+				grabLyrics(e, i+9)
+				}
+				lyrix = lyrix.bind(this);
+				
+				setTimeout(() => {
+					lyrix();
+				}, 50)
+					}});
+
+	</script>
+	
+</body>
+</html>
